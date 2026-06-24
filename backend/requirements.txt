@@ -1,0 +1,20 @@
+# Web 框架
+fastapi==0.110.0
+uvicorn[standard]==0.27.1
+
+# 数据库 ORM (异步)
+sqlalchemy[asyncio]==2.0.27
+asyncpg==0.29.0
+geoalchemy2==0.14.4
+
+# 工具
+python-dotenv==1.0.1
+pydantic-settings==2.2.1
+
+# 缓存
+redis==5.0.1
+
+# Phase 2: 封面下载 ETL
+httpx==0.27.0          # 异步 HTTP 客户端,调 Cover Art Archive
+Pillow==10.3.0         # 图片 resize / 转 JPEG
+minio==7.2.7           # MinIO/S3 客户端

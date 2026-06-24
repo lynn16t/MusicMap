@@ -1,0 +1,395 @@
+﻿Total slides: 14
+
+===== Slide 1 =====
+[GROUP: Group 6]
+[TEXT shape 'TextBox 22']
+全球流行专辑动态地图
+---
+[TEXT shape 'TextBox 24']
+地图设计与电子地图学第十小组：10230111刘艺童  |  10230112朱曼丽  |  10230209张书铭  |  10230231贾依依  |  10230340葛晴
+---
+[TEXT shape 'TextBox 25']
+The Global Album Map
+---
+[TEXT shape 'TextBox 26']
+Music Map
+---
+[TEXT shape 'TextBox 27']
+—— 基于流媒体时代(2010-2025)的地理时空滚动叙事
+---
+
+===== Slide 2 =====
+[GROUP: Group 4]
+  [sub 'TextBox 8'] The Global Album Map
+[TEXT shape 'TextBox 9']
+CONTENTS
+---
+[GROUP: Group 12]
+[TEXT shape 'TextBox 16']
+1.选题背景 BACKGROUND
+2.作品目标 OBJECTIVES
+3.实现方案 IMPLEMENTATION
+4.问题与特色 INNOVATIONS
+5.分工计划 SCHEDULE
+---
+
+===== Slide 3 =====
+[GROUP: Group 4]
+  [sub 'TextBox 8'] The Global Album Map
+[TEXT shape 'TextBox 9']
+Music Map
+---
+[GROUP: Group 12]
+[TEXT shape 'TextBox 16']
+1.选题背景 BACKGROUND
+2.作品目标 OBJECTIVES
+3.实现方案 IMPLEMENTATION
+4.问题与特色 INNOVATIONS
+5.分工计划 SCHEDULE
+---
+
+===== Slide 4 =====
+[GROUP: Group 3]
+  [sub 'TextBox 4'] 时空脉络缺失
+  [sub 'TextBox 5']    流媒体时代,"专辑"作为一种完整艺术形态正在被重新定义,   但其全球发行的时空脉络从未被系统呈现。
+[GROUP: Group 6]
+  [sub 'TextBox 7'] 地理视角空白
+  [sub 'TextBox 8'] 现有音乐排行榜(Spotify Top、Billboard)只关注"火不火",   忽略了"在哪里产生"——文化地理学角度的可视化空缺
+
+[GROUP: Group 9]
+  [sub 'TextBox 10'] 数据基础成熟
+  [sub 'TextBox 11'] 开放音乐编目数据(MusicBrainz)已积累丰富的专辑条目,   配合公共地理边界数据,具备做"全球音乐地理图"的数据基础
+
+[GROUP: Group 12]
+  [sub 'TextBox 13'] 国内题材空白
+  [sub 'TextBox 14'] 验证了"地图 + 滚动叙事"是音乐文化主题的优秀表达形式;   国内同题材尚属空白
+
+[TEXT shape 'TextBox 16']
+选题背景
+---
+[GROUP: Group 20]
+
+===== Slide 5 =====
+[GROUP: Group 4]
+  [sub 'TextBox 8'] The Global Album Map
+[GROUP: Group 11]
+[TEXT shape 'TextBox 14']
+1.选题背景 BACKGROUND
+2.作品目标 OBJECTIVES
+3.实现方案 IMPLEMENTATION
+4.问题与特色 INNOVATIONS
+5.分工计划 SCHEDULE
+---
+[TEXT shape 'TextBox 16']
+Music Map
+---
+
+===== Slide 6 =====
+[GROUP: Group 6]
+[TEXT shape 'TextBox 9']
+全球地理网格表达
+---
+[TEXT shape 'TextBox 10']
+
+按国家面积切分网格
+每格放置一张专辑封面
+---
+[GROUP: Group 11]
+[TEXT shape 'TextBox 14']
+时间轴动态演进
+---
+[TEXT shape 'TextBox 15']
+
+2010-2025 拖动时间轴
+每年专辑动态填入/覆盖
+---
+[GROUP: Group 16]
+[TEXT shape 'TextBox 19']
+滚动故事叙事
+---
+[TEXT shape 'TextBox 20']
+
+关键年份(2011/2015/2020/2021)
+联动文字解读   
+---
+[TEXT shape 'TextBox 22']
+作品目标
+---
+[GROUP: Group 23]
+[TEXT shape 'TextBox 26']
+交互探索+个性化
+---
+[TEXT shape 'TextBox 27']
+
+点击专辑详情、试听片段等
+按国家/流派/年代过滤
+---
+[GROUP: Group 29]
+
+===== Slide 7 =====
+[GROUP: Group 4]
+  [sub 'TextBox 8'] The Global Album Map
+[GROUP: Group 11]
+[TEXT shape 'TextBox 15']
+1.选题背景 BACKGROUND
+2.作品目标 OBJECTIVES
+3.实现方案 IMPLEMENTATION
+4.问题与特色 INNOVATIONS
+5.分工计划 SCHEDULE
+---
+[TEXT shape 'TextBox 16']
+Music Map
+---
+
+===== Slide 8 =====
+[GROUP: Group 7]
+  [sub 'TextBox 9'] 原始数据
+导入专辑与国家边界数据
+[GROUP: Group 10]
+  [sub 'TextBox 12'] 数据清洗
+过滤非专辑记录与重复版本
+[GROUP: Group 13]
+  [sub 'TextBox 15'] 国家映射
+统一专辑国家归属
+[GROUP: Group 16]
+  [sub 'TextBox 18'] 数据库构建
+构建专辑数据库
+[TEXT shape 'TextBox 22']
+专辑数据库
+---
+[TEXT shape 'TextBox 23']
+基于MusicBrainz开源数据库，提取近15年全球发行的专辑元数据
+---
+[TEXT shape 'TextBox 24']
+专辑封面数据
+---
+[TEXT shape 'TextBox 25']
+依托 Spotify 开放的专辑封面 URL，批量抓取对应的专辑封面图
+---
+[TEXT shape 'TextBox 26']
+国界矢量数据
+---
+[TEXT shape 'TextBox 27']
+全球国家与地区的标准多边形边界矢量，用作空间数据底座，辅助后续制图与网格生成
+
+---
+[TEXT shape 'TextBox 28']
+实现方案
+---
+[TEXT shape 'TextBox 29']
+主要数据源
+---
+[TEXT shape 'TextBox 30']
+数据处理流程
+---
+[TEXT shape 'TextBox 31']
+数据采集与处理
+
+---
+
+===== Slide 9 =====
+[TEXT shape 'TextBox 4']
+实现方案
+---
+[TEXT shape 'TextBox 9']
+底图层
+---
+[TEXT shape 'TextBox 10']
+地图制作与可视化
+---
+[TEXT shape 'TextBox 11']
+渲染层
+---
+[TEXT shape 'TextBox 12']
+网格层
+---
+[TEXT shape 'TextBox 13']
+时间轴层
+---
+[TEXT shape 'TextBox 14']
+MapTiler SDK 
+MapLibre GL
+
+---
+[TEXT shape 'TextBox 15']
+自定义复古色调世界底图
+
+---
+[TEXT shape 'TextBox 16']
+PostGIS
+---
+[TEXT shape 'TextBox 17']
+PostGIS端预计算处理
+每个国家 ST_SquareGrid 生成网格
+与国界相交生成国家专属网格
+
+
+---
+[TEXT shape 'TextBox 18']
+deck.gl
+WebGL
+
+---
+[TEXT shape 'TextBox 19']
+加速批量渲染专辑封面于网格中
+控制专辑入场/切换/覆盖动画
+
+---
+[TEXT shape 'TextBox 20']
+Vue 3 + Pinia + MapLibre GL JS
+---
+[TEXT shape 'TextBox 21']
+底层时间轴样式播放器
+切换年份刷新每个国家网格内专辑
+
+---
+[TEXT shape 'TextBox 22']
+技术栈
+---
+[TEXT shape 'TextBox 23']
+功能与目标
+---
+
+===== Slide 10 =====
+[GROUP: Group 9]
+  [sub 'TextBox 10'] 滚动故事叙事
+  [sub 'TextBox 11'] 滚动页面自动触发地图状态切换，结合关键年份注释与统计图变化，引导用户理解 2010—2025 年全球专辑演化过程。
+[GROUP: Group 12]
+  [sub 'TextBox 13'] 持续型艺人专题
+  [sub 'TextBox 14'] 识别跨多个时代持续发行作品的艺人，以时间轨迹方式展示其创作生命周期。
+[GROUP: Group 15]
+  [sub 'TextBox 16'] WEB 应用发布
+  [sub 'TextBox 17'] Vue3 + MapLibre 构建前端交互地图界面，Vite打包，后端数据库存储与接口由FastAPI+PostGIS提供，支持跨平台在线浏览与交互探索。
+[TEXT shape 'TextBox 18']
+实现方案
+---
+[TEXT shape 'TextBox 19']
+滚动叙事与网页发布
+
+---
+
+===== Slide 11 =====
+[GROUP: Group 4]
+  [sub 'TextBox 8'] The Global Album Map
+[GROUP: Group 11]
+[TEXT shape 'TextBox 15']
+1.选题背景 BACKGROUND
+2.作品目标 OBJECTIVES
+3.实现方案 IMPLEMENTATION
+4.问题与特色 INNOVATIONS
+5.分工计划 SCHEDULE
+---
+[TEXT shape 'TextBox 16']
+Music Map
+---
+
+===== Slide 12 =====
+[IMAGE: 图片 29]
+[IMAGE: 图片 28]
+[TEXT shape 'TextBox 10']
+海量数据处理
+---
+[TEXT shape 'TextBox 11']
+地理归属语义
+---
+[TEXT shape 'TextBox 12']
+异构数据源整合
+---
+[TEXT shape 'TextBox 13']
+百万级专辑与艺人关联,
+需 PostGIS 索引设计 + 
+分批 ETL
+---
+[TEXT shape 'TextBox 14']
+音乐编目的"区域"概念与行政边界不完全一致,
+   需递归映射至国家级以避免
+大量数据被错误过滤
+---
+[TEXT shape 'TextBox 15']
+多源数据的标识符对齐与去重,跨服务图片资源获取
+---
+[TEXT shape 'TextBox 12']
+大规模视觉渲染
+---
+[TEXT shape 'TextBox 15']
+ 单屏数千图元的浏览器端
+流畅交互,
+   需 GPU 加速 + 
+懒加载 + 多层级抽样
+---
+[TEXT shape 'TextBox 10']
+聚焦流媒体时代窗口的纵向时间脉络
+---
+[TEXT shape 'TextBox 10']
+全球均权的网格表达,小国与大国同等可见
+---
+[TEXT shape 'TextBox 10']
+中文及非英语世界
+的视角补全
+---
+[TEXT shape 'TextBox 10']
+后端 / ETL / 前端全开源,可被复用做其他类似选题
+---
+[TEXT shape 'TextBox 10']
+数据源完全可复现，完整开源
+---
+[IMAGE: 图片 26]
+[IMAGE: 图片 30]
+[TEXT shape 'TextBox 13']
+困难与创新
+---
+[IMAGE: 图片 2]
+
+===== Slide 13 =====
+[GROUP: Group 8]
+  [sub 'TextBox 9'] 在线web应用
+  [sub 'TextBox 10'] 单页交互可视化网站
+[TEXT shape 'TextBox 12']
+开源代码仓库
+---
+[TEXT shape 'TextBox 15']
+公开数据集
+---
+[GROUP: Group 17]
+  [sub 'TextBox 18'] 实验报告
+  [sub 'TextBox 19'] 完整技术文档+踩坑笔记
+[TEXT shape 'TextBox 9']
+处理后的 app.albums
+(143 万行,按国家/年份索引)
+---
+[TEXT shape 'TextBox 18']
+ 前后端 + ETL 脚本全开放
+
+
+---
+[GROUP: Group 8]
+  [sub 'TextBox 9'] 功能性
+  [sub 'TextBox 10']  时间轴拖动响应 < 200ms
+ 单国家 1000 网格首屏渲染 < 1s
+[GROUP: Group 8]
+  [sub 'TextBox 9'] 易用性
+  [sub 'TextBox 10']  滚动叙事自适应,移动端可看
+[GROUP: Group 8]
+  [sub 'TextBox 9'] 多样化测试
+  [sub 'TextBox 10']   Chrome / Edge / 移动端 Safari 兼容
+[IMAGE: 图片 38]
+[TEXT shape 'TextBox 13']
+产出与测试
+---
+[IMAGE: 图片 13]
+[IMAGE: 图片 39]
+
+===== Slide 14 =====
+[GROUP: Group 4]
+  [sub 'TextBox 8'] The Global Album Map
+[GROUP: Group 11]
+[TEXT shape 'TextBox 15']
+1.选题背景 BACKGROUND
+2.作品目标 OBJECTIVES
+3.实现方案 IMPLEMENTATION
+4.问题与特色 INNOVATIONS
+5.分工计划 SCHEDULE
+---
+[TEXT shape 'TextBox 16']
+Music Map
+---

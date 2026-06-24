@@ -1,0 +1,270 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===========================================================
+   MusicMap 播放器 UI  ——  Radiooo 风格复刻
+   主题色 #C20C0C(近网易云红) + 黑 / 白 / 暗红 邻近色
+   (从 player.html 原样移植,Tailwind 仅备用,组件沿用这些类)
+   =========================================================== */
+:root{
+  --red:        #C76B7C;
+  --red-bright: #E08A9A;
+  --red-deep:   #3A1C22;
+  --red-deeper: #2A1318;
+  --ink:        #160a0d;
+  --ink-2:      #1f0e12;
+  --ocean:      #0A0E14;
+  --line:       rgba(199,107,124,.32);
+  --white:      #ffffff;
+  --paper:      #f4ece9;
+  --muted:      #c9a9ad;
+  --amber:      #f2c14e;
+  --bar-h:      96px;
+}
+*{box-sizing:border-box;}
+/* scroll story 需要整页可纵向滚动:不再锁 height:100% / overflow:hidden(原地图页是单屏才锁的) */
+html,body,#root{margin:0;}
+body{
+  font-family:-apple-system,"Segoe UI","Microsoft YaHei",Arial,sans-serif;
+  background:#000;            /* 纯黑:不遮挡样式自带的星空/红色辉光 */
+  color:var(--white);
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+.icon{width:20px;height:20px;display:block;}
+
+/* ============ 顶栏 TOP BAR (U/⊔ 形) ============ */
+.topbar{
+  position:fixed;top:0;left:18px;right:18px;height:62px;z-index:30;
+  display:flex;align-items:center;gap:14px;padding:0 14px;overflow:hidden;
+  background:linear-gradient(180deg,#2a1015 0%, var(--ink) 100%);
+  border:2px solid var(--red);border-top:none;border-radius:0 0 16px 16px;
+  box-shadow:0 6px 22px rgba(0,0,0,.55);
+}
+.logo{position:relative;display:flex;align-items:center;height:38px;
+  padding:0 30px 0 14px;background:#111;border:2px solid #000;
+  clip-path:polygon(0 0,100% 0,86% 50%,100% 100%,0 100%);}
+.logo b{font:900 22px/1 "Arial Black",Arial;letter-spacing:1px;color:#fff;}
+.logo .dots{display:flex;gap:3px;margin-left:8px;}
+.logo .dots i{width:7px;height:7px;border-radius:50%;background:var(--red);display:block;}
+.logo .dots i:nth-child(4){background:#777;}
+.logo .dots i:nth-child(5){background:#777;}
+
+.speed-group{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:10px;}
+.speed{display:flex;flex-direction:column;align-items:center;gap:3px;
+  width:66px;padding-top:4px;background:linear-gradient(180deg,#301318,#1c0c10);
+  border:2px solid #000;border-radius:14px 14px 6px 6px;}
+/* 默认:红色(关) */
+.speed .lens{width:30px;height:30px;border-radius:50%;margin-top:4px;
+  background:radial-gradient(circle at 35% 30%, #ffc2cb, var(--red) 55%, #7a2c38 100%);
+  box-shadow:0 0 10px var(--red),inset 0 0 6px rgba(0,0,0,.6);}
+/* 开启:蓝色 */
+.speed.on .lens{background:radial-gradient(circle at 35% 30%,#9fd6ff,#3a7fb5 55%,#10314a 100%);
+  box-shadow:0 0 10px rgba(80,150,210,.85),inset 0 0 6px rgba(0,0,0,.6);}
+.speed span{font-size:11px;font-weight:800;letter-spacing:1px;padding-bottom:4px;color:#f1d9da;}
+
+/* ============ 中间舞台:真实地图 ============ */
+#stars{position:fixed;inset:0;z-index:0;background:#000;pointer-events:none;}
+/* 四周均匀的白色辉光:最亮处≈地球边缘(~60%),向外渐暗;尺寸/位置由 JS 精确更新。颜色后续再调 */
+#glow{position:fixed;z-index:0;transform:translate(-50%,-50%);pointer-events:none;border-radius:50%;
+  background:radial-gradient(circle,
+    rgba(255,255,255,0) 80%,
+    rgba(255,255,255,0.6) 82%,
+    rgba(255,255,255,0.15) 92%,
+    rgba(255,255,255,0) 100%);}
+#map{position:fixed;inset:0;z-index:1;background:transparent;}
+#loading{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:6;
+  padding:14px 24px;background:rgba(0,0,0,.8);color:#fff;border-radius:10px;font-size:14px;}
+
+/* ============ 底部播放器 PLAYER BAR (n/⊓ 形) ============ */
+.player{position:fixed;left:18px;right:18px;bottom:0;height:var(--bar-h);z-index:30;
+  display:flex;align-items:stretch;overflow:visible;
+  background:linear-gradient(180deg,#1f0c10 0%, #160a0d 100%);
+  border:2px solid var(--red);border-bottom:none;border-radius:0;
+  box-shadow:0 0 26px rgba(0,0,0,.6);}
+
+.cover{flex:0 0 96px;width:96px;height:var(--bar-h);position:relative;overflow:hidden;
+  background:#1c0c10;border-right:1px solid rgba(255,255,255,.06);}
+.cover .vinyl{position:absolute;right:-26px;top:50%;transform:translateY(-50%);
+  width:80px;height:80px;border-radius:50%;
+  background:repeating-radial-gradient(circle at center,#0b0b0b 0 2px,#1b1b1b 2px 4px);
+  box-shadow:0 0 0 2px #000;}
+.cover .vinyl::after{content:"";position:absolute;inset:28px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#ffc2cb,var(--red) 60%,#7a2c38);}
+/* 压在红色圆点内的小封面(固定尺寸,居中) */
+.cover .vinyl .disc-cover{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:22px;height:22px;border-radius:50%;object-fit:cover;z-index:1;
+  box-shadow:0 0 0 1px #000;}
+.cover .label{position:absolute;left:8px;top:8px;font-size:8px;font-weight:800;
+  color:#f2c14e;letter-spacing:.5px;line-height:1.1;text-shadow:0 1px 1px #000;}
+
+.center{flex:1;display:flex;align-items:center;gap:18px;padding:0 16px;min-width:0;}
+
+.mini-actions{display:flex;gap:9px;flex:0 0 auto;}
+.mini{width:38px;height:38px;border-radius:50%;background:var(--red);
+  display:flex;align-items:center;justify-content:center;position:relative;
+  box-shadow:0 2px 6px rgba(199,107,124,.5);}
+.mini:hover{background:var(--red-bright);}
+.mini .badge{position:absolute;right:-2px;bottom:-2px;background:#fff;color:var(--red);
+  font-size:9px;font-weight:900;border-radius:9px;padding:0 4px;line-height:13px;}
+
+.transport{display:flex;align-items:center;gap:10px;flex:0 0 auto;}
+.tbtn{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  border:2px solid var(--red);color:#fff;}
+.tbtn:hover{background:rgba(199,107,124,.25);}
+.tbtn.play{width:54px;height:54px;background:var(--red);border-color:var(--red);
+  box-shadow:0 0 16px rgba(199,107,124,.6);}
+.tbtn.play:hover{background:var(--red-bright);}
+
+.track{flex:1;min-width:0;text-align:center;}
+.track .title{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.track .sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.track .pbar{height:3px;border-radius:2px;background:#3a2a2c;margin-top:5px;overflow:hidden;}
+.track .pbar .pfill{height:100%;background:linear-gradient(90deg,var(--red-bright),var(--red));width:0;}
+.track .times{display:flex;justify-content:space-between;font-size:11px;color:#9b8b8e;margin-top:4px;}
+
+.volume{display:flex;align-items:center;gap:8px;flex:0 0 auto;}
+.volume input[type=range]{-webkit-appearance:none;appearance:none;width:90px;height:4px;border-radius:3px;
+  background:linear-gradient(90deg,var(--red) 0 60%,#3a2a2c 60% 100%);}
+.volume input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;
+  background:#fff;box-shadow:0 0 4px rgba(0,0,0,.6);}
+
+.discovered{flex:0 0 320px;display:flex;align-items:center;gap:12px;padding:0 14px;
+  background:linear-gradient(180deg,#2a1015,#180608);position:relative;
+  border-left:1px solid rgba(255,255,255,.06);}
+.discovered .avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;
+  background:linear-gradient(135deg,var(--red),#612430);flex:0 0 56px;padding:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.15);
+  transition:border-color .15s, box-shadow .15s;}
+.discovered .avatar:hover{border-color:rgba(255,255,255,.45);}
+.discovered .avatar:active{transform:scale(.94);}
+.discovered .meta{min-width:0;flex:1;}
+.discovered .meta .k{font-size:9px;letter-spacing:1.5px;color:#b98c90;font-weight:700;}
+.discovered .meta .name{font-size:15px;font-weight:800;line-height:1.2;}
+.discovered .meta .country{font-size:12px;color:var(--muted);}
+.discovered .meta a{font-size:11px;color:#7fb0e0;text-decoration:none;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;display:block;max-width:170px;}
+.discovered .side{display:flex;flex-direction:column;align-items:center;gap:10px;}
+/* 紧凑速度键(从顶栏移来,放在极光开关左侧) */
+.speed-mini{display:flex;align-items:center;gap:8px;flex:0 0 auto;padding-right:4px;}
+.speed-mini .sdot{display:flex;flex-direction:column;align-items:center;gap:3px;background:transparent;}
+.speed-mini .sdot .lens{width:18px;height:18px;border-radius:50%;display:block;
+  background:radial-gradient(circle at 35% 30%,#ffc2cb,var(--red) 55%,#7a2c38 100%);
+  box-shadow:0 0 6px var(--red),inset 0 0 4px rgba(0,0,0,.6);transition:all .15s;}
+.speed-mini .sdot.on .lens{background:radial-gradient(circle at 35% 30%,#9fd6ff,#3a7fb5 55%,#10314a 100%);
+  box-shadow:0 0 7px rgba(80,150,210,.9),inset 0 0 4px rgba(0,0,0,.6);}
+.speed-mini .sdot .slabel{font-size:8px;font-weight:800;letter-spacing:.3px;color:#cfa9ad;line-height:1;}
+.speed-mini .sdot.on .slabel{color:#f1d9da;}
+.discovered .pill-add{width:30px;height:30px;border-radius:50%;border:2px solid #fff;
+  display:flex;align-items:center;justify-content:center;}
+/* 极光开关:关=暗白描边;开=绿粉发光 */
+.aurora-toggle{cursor:pointer;background:transparent;color:rgba(255,255,255,.55);
+  border-color:rgba(255,255,255,.45);transition:all .15s;}
+.aurora-toggle:hover{color:#fff;border-color:#fff;}
+.aurora-toggle.on{color:#7dffb0;border-color:#7dffb0;
+  box-shadow:0 0 8px rgba(125,255,176,.7),0 0 14px rgba(255,120,200,.45);}
+
+/* 右侧控制簇:上排曲风下拉 / 下排 速度+极光 */
+.ctrl-stack{position:relative;display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex:0 0 auto;}
+.ctrl-row{display:flex;align-items:center;gap:12px;}
+/* 曲风分级下拉(菜单挂在整个控制簇上 → 左边与 SLOW 左对齐) */
+.genre-dd{position:static;}
+.genre-trigger{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:4px 9px;color:#e9e2e4;
+  cursor:pointer;font-size:12px;transition:all .15s;}
+.genre-trigger:hover{border-color:rgba(255,255,255,.4);}
+.genre-trigger.open{border-color:#f2c14e;color:#fff;}
+.genre-trigger .icon{width:15px;height:15px;flex:0 0 15px;}
+.genre-trigger .gt-label{max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-weight:700;letter-spacing:.3px;}
+.genre-menu{position:absolute;bottom:calc(100% + 9px);left:0;right:0;z-index:120;min-width:170px;
+  overflow:visible;background:rgba(18,12,16,.98);border:1px solid rgba(242,193,78,.32);border-radius:12px;
+  padding:5px;box-shadow:0 14px 36px rgba(0,0,0,.7);}
+.gm-row{position:relative;}
+.gm-bucket{display:flex;align-items:center;gap:7px;width:100%;text-align:left;background:transparent;
+  border:0;border-radius:7px;padding:7px 9px;color:#e7d7d9;cursor:pointer;font-size:13px;}
+.gm-row:hover>.gm-bucket,.gm-bucket:hover{background:rgba(242,193,78,.14);color:#fff;}
+.gm-bucket.on{background:rgba(242,193,78,.22);color:#f7e3b0;}
+.gm-bucket .gm-name{flex:1;}
+.gm-bucket .gm-cnt{font-size:11px;color:var(--muted);}
+.gm-bucket .gm-arrow{color:#b98c90;font-size:14px;line-height:1;}
+/* 细分浮层:粗桶左侧浮出,可停留滚动 */
+.gm-fines{position:fixed;z-index:121;width:200px;max-height:64vh;
+  overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
+  background:rgba(20,13,17,.98);border:1px solid rgba(242,193,78,.32);border-radius:12px;padding:5px;
+  box-shadow:0 14px 36px rgba(0,0,0,.7);}
+.gm-fine{display:flex;align-items:center;gap:7px;width:100%;text-align:left;background:transparent;border:0;
+  border-radius:7px;padding:6px 9px;color:#e7d7d9;cursor:pointer;font-size:12.5px;}
+.gm-fine:hover{background:rgba(242,193,78,.14);color:#fff;}
+.gm-fine.on{background:rgba(242,193,78,.22);color:#f7e3b0;}
+.gm-fine .gm-name{flex:1;text-transform:capitalize;}
+.gm-fine .gm-cnt{font-size:10.5px;color:var(--muted);}
+.gm-head{color:#f7e3b0;font-weight:700;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:3px;}
+.genre-menu::-webkit-scrollbar,.gm-fines::-webkit-scrollbar{width:6px;}
+.genre-menu::-webkit-scrollbar-thumb,.gm-fines::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:3px;}
+
+/* ============ esri 风格时间轴 (2010~2025) ============ */
+.esri{position:fixed;left:18px;right:18px;bottom:var(--bar-h);z-index:29;
+  background:linear-gradient(180deg,#000 0%,#0a0506 100%);
+  border:2px solid var(--red);border-bottom:none;border-radius:16px 16px 0 0;
+  padding:9px 22px 8px;box-shadow:0 -3px 12px rgba(0,0,0,.55);font:12px monospace;}
+.esri .row{display:flex;align-items:center;gap:16px;}
+.esri .timeline{position:relative;flex:1;height:30px;}
+.esri .vlines{position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;}
+.esri .vlines i{position:absolute;top:9px;bottom:14px;width:1px;
+  background:rgba(255,255,255,.22);transform:translateX(-.5px);}
+.esri .ctrls{display:flex;gap:6px;}
+.esri .ec{width:22px;height:22px;border-radius:50%;background:var(--amber);
+  display:flex;align-items:center;justify-content:center;color:#111;}
+.esri .ec.info{font-weight:900;}
+.esri .track-wrap{flex:1;position:relative;height:14px;}
+.esri .rail{position:absolute;left:0;right:0;top:6px;height:3px;background:#2a2a2a;border-radius:2px;}
+.esri .fill{position:absolute;left:0;top:6px;height:3px;width:0%;border-radius:2px;
+  background:linear-gradient(90deg,var(--red-bright),var(--red));}
+.esri .head{position:absolute;top:-1px;left:0%;width:13px;height:13px;border-radius:50%;
+  background:#fff;border:2px solid var(--red);transform:translateX(-50%);box-shadow:0 0 6px var(--red);}
+.esri .ticks{position:absolute;left:0;right:0;bottom:0;height:14px;color:#c9a96a;font-size:12px;
+  font-weight:700;font-family:"Microsoft YaHei","微软雅黑","Segoe UI",sans-serif;letter-spacing:.5px;}
+.esri .ticks span{position:absolute;transform:translateX(-50%);white-space:nowrap;}
+.esri .ticks span.first{transform:none;left:0!important;}
+.esri .ticks span.last{transform:none;left:auto!important;right:0;}
+.esri .ticks span.cur{color:#fff;font-weight:800;}
+
+/* 播放时舞台从亮到暗的蒙版 */
+#dimmer{position:fixed;inset:62px 0 var(--bar-h) 0;z-index:5;pointer-events:none;
+  background:#000;opacity:0;transition:opacity .15s linear;}
+
+/* ============ 点击封面弹出的 Spotify 嵌入播放器 ============ */
+.spotify-pop{position:fixed;left:24px;top:78px;z-index:40;width:340px;
+  background:linear-gradient(180deg,#1f0c10,#160a0d);
+  border:2px solid var(--red);border-radius:14px;padding:10px;
+  box-shadow:0 10px 32px rgba(0,0,0,.6);}
+.spotify-pop .sp-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.spotify-pop .sp-title{flex:1;min-width:0;}
+.spotify-pop .sp-title b{display:block;font-size:13px;font-weight:800;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.spotify-pop .sp-title span{font-size:11px;color:var(--muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
+.spotify-pop .sp-nav{width:26px;height:26px;border-radius:50%;border:2px solid var(--red);
+  color:#fff;font-size:15px;font-weight:900;line-height:1;flex:0 0 auto;}
+.spotify-pop .sp-nav:hover{background:var(--red);}
+.spotify-pop .sp-close{width:26px;height:26px;border-radius:50%;background:var(--red);
+  color:#fff;font-size:13px;font-weight:900;flex:0 0 auto;}
+.spotify-pop .sp-close:hover{background:var(--red-bright);}
+.spotify-pop .sp-msg{padding:28px 10px;text-align:center;color:var(--muted);font-size:13px;line-height:1.6;}
+.spotify-pop .sp-embed{border-radius:10px;overflow:hidden;}
+.spotify-pop .sp-embed iframe{display:block;border:0;border-radius:10px;}
+
+/* three.js 地球的国家/大洲标注(CSS2D) */
+.lbl-country{color:#FDDEA5;font:600 15px/1 Georgia,'Times New Roman',serif;-webkit-text-stroke:.6px #FF6766;paint-order:stroke fill;white-space:nowrap;pointer-events:none;}
+.lbl-cont{color:#FDDEA5;font:700 16px/1 Georgia,'Times New Roman',serif;letter-spacing:2px;-webkit-text-stroke:.8px #FF6766;paint-order:stroke fill;pointer-events:none;}
+.lbl-ocean{color:#F4A8C0;font:italic 600 13px/1 Georgia,'Times New Roman',serif;letter-spacing:1px;text-shadow:0 1px 3px rgba(0,0,0,.35);white-space:nowrap;pointer-events:none;}
+
+/* three.js 地球加载提示 */
+.globe-loading{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:20;
+  display:flex;align-items:center;gap:10px;padding:12px 22px;border-radius:12px;
+  background:rgba(28,12,16,.82);border:1px solid var(--line);color:#f1d9da;font-size:14px;font-weight:600;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);}
+.gl-spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.25);
+  border-top-color:var(--red-bright);animation:gl-rot .8s linear infinite;flex:0 0 auto;}
+@keyframes gl-rot{to{transform:rotate(360deg)}}

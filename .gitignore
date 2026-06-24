@@ -1,0 +1,54 @@
+# ---- Environment ----
+.env
+.env.local
+.env.*.local
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+.pytest_cache/
+
+# ---- Node / frontend ----
+node_modules/
+dist/
+.vite/
+*.local
+
+# ---- Data dumps (huge!) ----
+data/
+*.dump
+*.tar
+*.tar.bz2
+*.tar.gz
+*.rar
+*.zip
+
+# ---- Generated artifacts ----
+# 预烤图集（~190MB，可由 backend/app/bake_atlas.py 重新生成）
+backend/app/_atlas/
+
+# ---- Large media / 演示素材（超 GitHub 100MB 限制） ----
+*.mp4
+*.mov
+*.pptx
+*.ppt
+herodemo/
+
+# ---- 本地归档 ----
+存档/
+
+# ---- IDE ----
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# ---- Docker volumes ----
+docker_volumes/
+
+# ---- Logs ----
+*.log

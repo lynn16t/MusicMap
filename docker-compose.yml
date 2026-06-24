@@ -1,0 +1,107 @@
+# MusicMap 开发环境编排
+# 使用方法:
+#   1. 复制 .env.example 为 .env (并按需修改密码)
+#   2. docker compose up -d
+#   3. docker compose logs -f backend  (看后端日志)
+#   4. 访问 http://localhost:8000/health 验证
+
+services:
+  # ─────────────────────────────────────────────────────
+  # PostGIS:带空间扩展的 PostgreSQL,我们项目的核心数据库
+  # ─────────────────────────────────────────────────────
+  postgis:
+    build:
+      context: ./docker/postgis
+      dockerfile: Dockerfile
+    image: musicmap-postgis:16-3.4-cli
+    container_name: musicmap-postgis
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"             # 暴露到宿主机,方便用 DBeaver/pgAdmin 直连
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+      # 容器首次启动时,会自动执行这里的 SQL,启用 PostGIS 扩展
+      - ./docker/postgis/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      # Phase 1 ETL:把 MusicBrainz dump 目录只读 mount 进容器,
+      # 容器里用 psql \copy /mb/<tablename> 直接读 TSV
+      - ./data/musicbrainz-sample/mbdump:/mb:ro
+      # Phase 3 ETL:Natural Earth 矢量数据(国家边界 shp),给 shp2pgsql 用
+      - ./data/natural-earth:/ne:ro
+      # ETL SQL 脚本也 mount 进去,方便 docker exec 里直接执行
+      - ./etl:/etl:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ─────────────────────────────────────────────────────
+  # Redis:缓存层,Phase 2 起会用到(API 响应缓存、限流)
+  # ─────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: musicmap-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # ─────────────────────────────────────────────────────
+  # MinIO:S3 兼容的对象存储,以后用来存专辑封面缓存
+  #   - API 端口 9000(给程序用)
+  #   - 控制台端口 9001(浏览器访问,可视化管理)
+  # ─────────────────────────────────────────────────────
+  minio:
+    image: minio/minio:latest
+    container_name: musicmap-minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      # Phase 2: 封面存储改到 F 盘(D 盘空间紧张,F 盘有 500+ GB 可用)
+      # 估算 ~100 GB(125 万张专辑封面 resize 后)
+      - "F:/musicmap/minio-data:/data"
+    command: server /data --console-address ":9001"
+
+  # ─────────────────────────────────────────────────────
+  # Backend:FastAPI 应用
+  #   - 用 volume 把本地代码挂进容器,改了 .py 文件不用重 build
+  #   - --reload 让 uvicorn 监听文件变化自动重启
+  # ─────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: musicmap-backend
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgis:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379/0
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      # Phase 2 Spotify ETL 用,从 .env 注入
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID:-}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET:-}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/app/app    # 代码热重载
+      - ./etl:/etl:ro             # Phase 2: ETL 脚本(在容器内可执行)
+      - ./frontend:/frontend:ro   # Phase 3: 静态检查页(grid-inspector.html)
+    depends_on:
+      postgis:
+        condition: service_healthy   # 等数据库 ready 再启
+      redis:
+        condition: service_started
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgis_data:
+  redis_data:
+  minio_data:
